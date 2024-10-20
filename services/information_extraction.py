@@ -40,12 +40,13 @@ def extract_infos(text: str):
     surface_pattern = re.compile(r"\b\d+(?:\.\d+)?m²\b")
     match = surface_pattern.search(text)
     if match:
-        extracted_data["property_details"]["surface"] = match.group()
+        extracted_data["property_details"]["surface"] = int(match.group()[:-2])
 
     # ---- loan amount
     for ent in doc.ents:
         if ent.label_ == "MONEY":
-            extracted_data["property_details"]["loan_amount"] = ent.text
+            print("hello")
+            extracted_data["property_details"]["loan_amount"] = int(ent.text[:-1])
 
     # ---- description
     description = []

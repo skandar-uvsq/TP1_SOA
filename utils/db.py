@@ -19,8 +19,8 @@ def _create_tables_if_not_exist(cursor):
         id INTEGER PRIMARY KEY,
         personal_id INTEGER,
         address TEXT,
-        loan_amount TEXT,
-        surface TEXT,
+        loan_amount INTEGER,
+        surface INTEGER,
         description TEXT,
         FOREIGN KEY (personal_id) REFERENCES PersonalInformation (id)
     )
@@ -61,8 +61,8 @@ def load_data(data: dict):
         (
             personal_id,
             property_info.get("address", ""),
-            property_info.get("loan_amount", ""),
-            property_info.get("surface", ""),
+            property_info.get("loan_amount"),
+            property_info.get("surface"),
             description_str,
         ),
     )

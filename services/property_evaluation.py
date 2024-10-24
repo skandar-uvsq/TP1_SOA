@@ -1,10 +1,8 @@
-# Simulated Data
-# TODO: put it in a json file
-market_prices = {
-    "region_1": 2500,  # Price per square meter
-    "region_2": 3200,
-    "region_3": 2800,
-}
+import json
+import random
+from .information_extraction import extract_infos
+
+market_prices = {"paris": 30, "lyon": 18, "cean": 5}
 
 property_conditions = {
     "good": 1.0,  # No deduction
@@ -18,44 +16,51 @@ legal_compliance = {
 }
 
 
+# This function simulates whether the property is legally compliant or not
+def is_legally_compliant(address: str) -> bool:
+    """
+    Based on the exact address of the property, this function will do some requests
+    to external sources and return whether it is legally compliant or not.
+    Here just for simulation, we return a random value.
+    """
+    return random.choice([True, False])
+
+
 # Main function to estimate the property value
-def evaluate_property(region, area_sqm, condition, is_compliant):
-    # Step 1: Get market price for the region
-    if region not in market_prices:
-        print("Region not found.")
-        return None
-
-    price_per_sqm = market_prices[region]
-
-    # Step 2: Adjust based on the condition of the property
-    if condition not in property_conditions:
-        print("Condition not valid.")
-        return None
-
-    condition_multiplier = property_conditions[condition]
-
-    # Step 3: Adjust based on legal compliance
+def evaluate_property(address: str, region: str, area_sqm: int, condition: str):
+    price_per_sqm = market_prices.get(region.lower())
+    condition_multiplier = property_conditions.get(condition, "average")
+    is_compliant = is_legally_compliant(address="")
     compliance_multiplier = (
         legal_compliance["compliant"]
         if is_compliant
         else legal_compliance["non_compliant"]
     )
-
-    # Step 4: Calculate the final estimated value
     estimated_value = (
         area_sqm * price_per_sqm * condition_multiplier * compliance_multiplier
     )
-
+    print(f"Estimated property monthly cost ==> {estimated_value}")
     return estimated_value
 
 
-# Example usage
-region = "region_2"  # Chosen region
-area_sqm = 100  # Property area in square meters
-condition = "average"  # Property condition
-is_compliant = True  # Compliance status
+# Test
+# region = "paris"  # Chosen region
+# area_sqm = 100  # Property area in square meters
+# condition = "average"  # Property condition
+# is_compliant = True  # Compliance status
+# estimated_value = evaluate_property(region, area_sqm, condition, is_compliant)
 
-estimated_value = evaluate_property(region, area_sqm, condition, is_compliant)
 
-if estimated_value:
-    print(f"Estimated property value: {estimated_value} EUR")
+# for i in range(1, 6):
+#     with open(file=f"TP1_SOAP/sample_data/{i}.txt", encoding="utf-8") as f:
+#         text = f.read()
+#         data = extract_infos(text=text)
+
+#     estimated_value = evaluate_property(
+#         address=data["property_details"]["address"],
+#         region=data["property_details"]["region"],
+#         area_sqm=data["property_details"]["surface"],
+#         condition=data["property_details"]["description"][-1].split(" ")[0],
+#     )
+
+#     print("Estimated monthly cost:", estimated_value)

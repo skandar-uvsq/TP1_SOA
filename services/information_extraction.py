@@ -1,8 +1,22 @@
 import spacy
 import re
 from ..utils.db import load_data
+import json
 
 nlp = spacy.load("en_core_web_sm")
+
+
+def extract_region_from_address(address: str, nlp):
+    # Extract the city
+    doc = nlp(address)
+    city = None
+    for ent in doc.ents:
+        if (
+            ent.label_ == "GPE"
+        ):  # GPE is the label for Geopolitical Entities (includes cities)
+            city = ent.text
+            break
+    return city
 
 
 def extract_infos(text: str):
@@ -28,7 +42,7 @@ def extract_infos(text: str):
         extracted_data["personal_information"]["phone_number"] = match.group()
 
     # ---------------- Property details
-    # ---- address
+    # ---- full address
     address_pattern = re.compile(
         r"\d+\s[\w\s\-]+,\s\d{5}\s[\w\s\-]+,\s[\w\s\-\°]+,\s[\w\s\-\°]+"
     )
@@ -45,7 +59,6 @@ def extract_infos(text: str):
     # ---- loan amount
     for ent in doc.ents:
         if ent.label_ == "MONEY":
-            print("hello")
             extracted_data["property_details"]["loan_amount"] = int(ent.text[:-1])
 
     # ---- description
@@ -58,10 +71,18 @@ def extract_infos(text: str):
                 extracted_data["property_details"]["description"] = ent.text
                 description.append(f"{token.text} {token.head.text}")
     extracted_data["property_details"]["description"] = description
-    load_data(data=extracted_data)
+    # print(extracted_data)
+    # load_data(data=extracted_data)
+    # extract region from address
+    region = extract_region_from_address(
+        address=extracted_data["property_details"]["address"], nlp=nlp
+    )
+    extracted_data["property_details"]["region"] = region
+    print(json.dumps(extracted_data, indent=2))
+    return extracted_data
 
 
-for i in range(1, 6):
-    with open(file=f"TP1_SOAP/sample_data/{i}.txt", encoding="utf-8") as f:
-        text = f.read()
-        extract_infos(text=text)
+# for i in range(1, 6):
+#     with open(file=f"TP1_SOAP/sample_data/{i}.txt", encoding="utf-8") as f:
+#         text = f.read()
+#         extract_infos(text=text)

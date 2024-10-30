@@ -69,5 +69,5 @@ wsgi_app = WsgiApplication(application)
 if __name__ == "__main__":
 
     server = make_server("0.0.0.0", 8000, wsgi_app)
-    print("Data extraction service is running on port 8000...")
+    print("composite service is running on port 8000...")
     server.serve_forever()
